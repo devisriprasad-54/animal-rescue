@@ -1,0 +1,377 @@
+### Animal Rescue Network - API Test Requests
+### Make sure backend is running: npm run dev
+### Backend URL: http://localhost:5000
+
+@baseUrl = http://localhost:5001
+@contentType = application/json
+
+### ============================================
+### STEP 1: SIGNUP REQUESTS
+### ============================================
+
+### Regular User Signup
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "role": "user",
+  "phone": "+1-555-0101",
+  "address": "New York, NY"
+}
+
+### Volunteer Signup  
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Jane Volunteer",
+  "email": "jane.volunteer@example.com",
+  "password": "password123",
+  "role": "volunteer",
+  "phone": "+1-555-0102",
+  "address": "Los Angeles, CA",
+  "skills": ["First Aid", "Animal Handling", "Tracking"]
+}
+
+### NGO Signup
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "name": "Save Animals Foundation",
+  "email": "ngo@saveanimals.com",
+  "password": "password123",
+  "role": "ngo",
+  "ngoName": "Save Animals Foundation",
+  "registrationNumber": "NGO-2024-001",
+  "phone": "+1-555-0103",
+  "address": "Chicago, IL"
+}
+
+### ============================================
+### STEP 2: LOGIN REQUESTS (Get JWT Token)
+### ============================================
+
+### User Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+###
+### Volunteer Login
+POST {{baseUrl}}/api/auth/login  
+Content-Type: {{contentType}}
+
+{
+  "email": "jane.volunteer@example.com",
+  "password": "password123"
+}
+
+###
+### NGO Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "ngo@saveanimals.com",
+  "password": "password123"
+}
+
+### ============================================
+### STEP 3: ANIMAL ENDPOINTS
+### ============================================
+
+### Get All Animals (No Auth Required)
+GET {{baseUrl}}/api/animals
+
+###
+### Get Animals by Species
+GET {{baseUrl}}/api/animals?species=Dog
+
+###
+### Get Available Animals for Adoption
+GET {{baseUrl}}/api/animals?isAdopted=false
+
+###
+### Create Animal (NGO Only - Use JWT Token)
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "name": "Bella",
+  "species": "Dog",
+  "breed": "Golden Retriever",
+  "age": "2",
+  "healthStatus": "Healthy",
+  "rescueStory": "Found on streets, now ready for adoption",
+  "images": []
+}
+
+###
+### Get Specific Animal
+GET {{baseUrl}}/api/animals/ANIMAL_ID
+
+###
+### Request Adoption
+PUT {{baseUrl}}/api/animals/ANIMAL_ID/adopt
+Authorization: Bearer YOUR_JWT_TOKEN
+
+###
+### Delete Animal (NGO Only - Must be the animal creator)
+DELETE {{baseUrl}}/api/animals/ANIMAL_ID
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+### ============================================
+### STEP 4: RESCUE REQUEST ENDPOINTS
+### ============================================
+
+### Get All Rescue Requests  
+GET {{baseUrl}}/api/rescues
+
+###
+### Get Pending Rescues Only
+GET {{baseUrl}}/api/rescues?status=pending
+
+###
+### Get Critical Rescues
+GET {{baseUrl}}/api/rescues?emergencyLevel=critical
+
+###
+### Report New Rescue Emergency
+POST {{baseUrl}}/api/rescues
+Content-Type: {{contentType}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "animalType": "Dog",
+  "location": "Main Street, Downtown",
+  "description": "Injured dog found on the side of the road",
+  "emergencyLevel": "critical",
+  "images": []
+}
+
+###
+### Add Update to Rescue
+POST {{baseUrl}}/api/rescues/RESCUE_ID/updates
+Content-Type: {{contentType}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "text": "Arrived at location. Animal is stable. Transporting to clinic."
+}
+
+###
+### Update Rescue Status (NGO Only)
+PUT {{baseUrl}}/api/rescues/RESCUE_ID
+Content-Type: {{contentType}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "status": "assigned",
+  "assignedVolunteer": "VOLUNTEER_ID"
+}
+
+###
+### Close Rescue Request
+PUT {{baseUrl}}/api/rescues/RESCUE_ID/close
+Authorization: Bearer YOUR_JWT_TOKEN
+
+### ============================================
+### STEP 5: VOLUNTEER ENDPOINTS
+### ============================================
+
+### Get All Volunteers
+GET {{baseUrl}}/api/volunteers
+
+###
+### Get Volunteer Dashboard (Requires Auth)
+GET {{baseUrl}}/api/volunteers/dashboard
+Authorization: Bearer YOUR_JWT_TOKEN
+
+###
+### Update Volunteer Profile
+PUT {{baseUrl}}/api/volunteers/profile
+Content-Type: {{contentType}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "skills": ["First Aid", "Animal Handling", "Tracking", "Rescue Operations"],
+  "isAvailable": true,
+  "phone": "+1-555-0102",
+  "address": "Los Angeles, CA"
+}
+
+### ============================================
+### STEP 6: NGO ENDPOINTS
+### ============================================
+
+### Get All NGOs
+GET {{baseUrl}}/api/ngos
+
+###
+### Update NGO Profile  
+PUT {{baseUrl}}/api/ngos/profile
+Content-Type: {{contentType}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "ngoName": "Save Animals Foundation",
+  "registrationNumber": "NGO-2024-001",
+  "phone": "+1-555-0103",
+  "address": "Chicago, IL"
+}
+
+### ============================================
+### STEP 7: CREATE ANIMAL (NGO AUTH)
+### ============================================
+
+### Create Animal 1: Golden Retriever
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Buddy",
+  "species": "dog",
+  "breed": "Golden Retriever",
+  "age": 3,
+  "healthStatus": "healthy",
+  "rescueStory": "Found wandering in the park, very friendly and well-trained. Loves to play fetch!",
+  "images": ["https://images.unsplash.com/photo-1633722715463-d30628319855?w=500&q=80"]
+}
+
+###
+### Create Animal 2: Siamese Cat
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Luna",
+  "species": "cat",
+  "breed": "Siamese",
+  "age": 2,
+  "healthStatus": "healthy",
+  "rescueStory": "Rescued from an abandoned warehouse. Very affectionate and loves cuddles. Great with kids!",
+  "images": ["https://images.unsplash.com/photo-1513360371669-4a0eb3a0d4ff?w=500&q=80"]
+}
+
+###
+### Create Animal 3: German Shepherd
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Max",
+  "species": "dog",
+  "breed": "German Shepherd",
+  "age": 4,
+  "healthStatus": "healthy",
+  "rescueStory": "Trained police dog needing a calm home. Intelligent, loyal, and obedient. Perfect for experienced owners.",
+  "images": ["https://images.unsplash.com/photo-1568572933382-74d440642117?w=500&q=80"]
+}
+
+###
+### Create Animal 4: Persian Cat
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Whiskers",
+  "species": "cat",
+  "breed": "Persian",
+  "age": 1,
+  "healthStatus": "healthy",
+  "rescueStory": "Kitten found during a rescue operation. Playful, curious, and adorable. Needs a loving home!",
+  "images": ["https://images.unsplash.com/photo-1574158622682-e40e69881006?w=500&q=80"]
+}
+
+###
+### Create Animal 5: Labrador Mix
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Rocky",
+  "species": "dog",
+  "breed": "Labrador Mix",
+  "age": 5,
+  "healthStatus": "healthy",
+  "rescueStory": "Rescued from harsh street conditions. Calm, gentle giant who loves family time and swimming.",
+  "images": ["https://images.unsplash.com/photo-1544568100-847a948585b0?w=500&q=80"]
+}
+
+###
+### Create Animal 6: Tabby Cat
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Mittens",
+  "species": "cat",
+  "breed": "Tabby",
+  "age": 3,
+  "healthStatus": "healthy",
+  "rescueStory": "Found malnourished but now fully recovered. Independent but enjoys quality time with owners.",
+  "images": ["https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=500&q=80"]
+}
+
+###
+### Create Animal 7: Beagle
+POST {{baseUrl}}/api/animals
+Content-Type: {{contentType}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMTNjOWNjMDBhMjJhNjFlZGE5NTFhOSIsImlhdCI6MTc3OTY4MTc3NywiZXhwIjoxNzgyMjczNzc3fQ.2l5Mv4JU7r76Z5ZdVK20o9QH4WozZgJTV_6nPtkor2A
+
+{
+  "name": "Charlie",
+  "species": "dog",
+  "breed": "Beagle",
+  "age": 2,
+  "healthStatus": "healthy",
+  "rescueStory": "Energetic and adventurous beagle. Loves outdoor activities and is great with families. Needs regular exercise!",
+  "images": ["https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=500&q=80"]
+}
+
+### ============================================
+### TROUBLESHOOTING GUIDE
+### ============================================
+###
+### 1. Make sure backend is running:
+###    cd backend && npm run dev
+###
+### 2. Make sure MongoDB is running:
+###    brew services start mongodb-community
+###
+### 3. Check .env file exists in backend folder with:
+###    PORT=5000
+###    MONGO_URI=mongodb://localhost:27017/animal-rescue
+###    JWT_SECRET=animal-rescue-secret
+###
+### 4. To use JWT Token:
+###    - Run signup request first
+###    - Run login request to get token
+###    - Copy the "token" field from response
+###    - Replace YOUR_JWT_TOKEN in requests above
+###
+### 5. For VS Code REST Client Extension:
+###    - Install: humao.rest-client
+###    - Click "Send Request" above any request
+###
+### 6. Common Issues:
+###    - 400: Bad request - check JSON format
+###    - 401: Unauthorized - token missing or invalid
+###    - 500: Server error - check backend console
+###    - Connection refused - backend not running
+###
