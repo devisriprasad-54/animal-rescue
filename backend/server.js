@@ -19,15 +19,34 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// CORS Configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    process.env.FRONTEND_URL || 'https://animal-rescue.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // DB Connection
+console.log('Connecting to MongoDB with URI:', process.env.MONGO_URI ? 'Set' : 'Not set');
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/animal-rescue')
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err.message);
+    if (!process.env.MONGO_URI) {
+      console.error('MONGO_URI environment variable not set. Using local MongoDB fallback.');
+    }
+  });
 
 // Basic Route Structure
 app.get('/', (req, res) => {
