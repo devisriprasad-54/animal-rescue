@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = process.env.VITE_API_URL || 'https://animal-rescue-u26c.onrender.com/api';
 
 const getHeaders = () => {
   const user = localStorage.getItem('rescueUser');
